@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
+import { JokeType } from "./types/api";
 
 function App() {
-	const [joke, setJoke] = useState("");
+	const [joke, setJoke] = useState<JokeType>();
 
 	useEffect(() => {
 		fetch("https://icanhazdadjoke.com/", {
@@ -9,7 +10,7 @@ function App() {
 			headers: { Accept: "application/json" },
 		})
 			.then((res) => res.json())
-			.then((data) => setJoke(data.joke));
+			.then((data: JokeType) => setJoke(data));
 	}, []);
 
 	return (
@@ -18,7 +19,7 @@ function App() {
 			<div>
 				<h1 className={"font-title text-4xl"}>Hello! Welcome to the playground.</h1>
 				<p className={"text-lg"}>Here's a dad joke (:</p>
-				<p className={"text-md py-8"}>{joke}</p>
+				<p className={"text-md py-8"}>{joke?.joke}</p>
 			</div>
 			<div />
 		</div>
