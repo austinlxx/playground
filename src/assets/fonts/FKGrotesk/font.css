@@ -1,0 +1,18 @@
+@font-face {
+    font-family: 'FK Grotesk';
+    src: url('FKGrotesk-Regular.woff2') format('woff2'),
+        url('FKGrotesk-Regular.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'FK Grotesk';
+    src: url('FKGrotesk-Medium.woff2') format('woff2'),
+        url('FKGrotesk-Medium.woff') format('woff');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+

@@ -1,0 +1,9 @@
+@font-face {
+    font-family: 'FK Grotesk Mono';
+    src: url('FKGroteskMono-Medium.woff2') format('woff2'),
+        url('FKGroteskMono-Medium.woff') format('woff');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+

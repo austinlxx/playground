@@ -1,0 +1,90 @@
+@font-face {
+    font-family: 'Gustavo';
+    src: url('Gustavo-Bold.woff2') format('woff2'),
+        url('Gustavo-Bold.woff') format('woff');
+    font-weight: bold;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Gustavo';
+    src: url('Gustavo-MediumItalic.woff2') format('woff2'),
+        url('Gustavo-MediumItalic.woff') format('woff');
+    font-weight: 500;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Gustavo';
+    src: url('Gustavo-Italic.woff2') format('woff2'),
+        url('Gustavo-Italic.woff') format('woff');
+    font-weight: normal;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Gustavo';
+    src: url('Gustavo-Light.woff2') format('woff2'),
+        url('Gustavo-Light.woff') format('woff');
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Gustavo';
+    src: url('Gustavo-LightItalic.woff2') format('woff2'),
+        url('Gustavo-LightItalic.woff') format('woff');
+    font-weight: 300;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Gustavo';
+    src: url('Gustavo-BoldItalic.woff2') format('woff2'),
+        url('Gustavo-BoldItalic.woff') format('woff');
+    font-weight: bold;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Gustavo';
+    src: url('Gustavo-Regular.woff2') format('woff2'),
+        url('Gustavo-Regular.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Gustavo';
+    src: url('Gustavo-Thin.woff2') format('woff2'),
+        url('Gustavo-Thin.woff') format('woff');
+    font-weight: 100;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Gustavo';
+    src: url('Gustavo-Medium.woff2') format('woff2'),
+        url('Gustavo-Medium.woff') format('woff');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Gustavo';
+    src: url('Gustavo-ThinItalic.woff2') format('woff2'),
+        url('Gustavo-ThinItalic.woff') format('woff');
+    font-weight: 100;
+    font-style: italic;
+    font-display: swap;
+}
+

@@ -1,0 +1,12 @@
+@font-face {
+  font-family: 'Arthemys Display';
+  src: url('ArthemysDisplay-Light.eot');
+  src: url('ArthemysDisplay-Light.eot?#iefix') format('embedded-opentype'),
+       url('ArthemysDisplay-Light.svg#ArthemysDisplay-Light') format('svg'),
+       url('ArthemysDisplay-Light.ttf') format('truetype'),
+       url('ArthemysDisplay-Light.woff') format('woff'),
+       url('ArthemysDisplay-Light.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+}
+
