@@ -22,16 +22,3 @@ a {
 a:hover {
     color: #001AFF;
 }
-
-#root {
-    flex-grow: 1;
-}
-
-/* override readme parent container 😡 */
-#content-container {
-    max-width: unset !important;
-}
-
-#content-head {
-    display: none;
-}
