@@ -49,17 +49,6 @@ function App() {
 	const [businessesPerCounty, setBusinessesPerCounty] = useState<any>({});
 	const [cities, setCities] = useState<CityColumnsType[]>([]);
 
-	const downloadAsCsv = () => {
-		const commaDelimited: any[] = [];
-
-		cities.map((city, index, array) => {
-			if (index === 0) return commaDelimited.push(Object.values(cityColumns));
-			commaDelimited.push(Object.values(city));
-		});
-
-		console.log(commaDelimited);
-	};
-
 	useEffect(() => {
 		Promise.all([
 			getCountyProfile(),
@@ -129,12 +118,32 @@ function App() {
 		});
 	}, []);
 
+	const downloadAsCsv = () => {
+		const arr: any[] = [];
+		let csvContent = "";
+
+		cities.map((city, index) => {
+			if (index === 0) return arr.push(Object.values(cityColumns));
+			arr.push(Object.values(city).map((val) => `"${val}"`));
+		});
+
+		arr.map((row) => {
+			csvContent += row.join(",") + "\n";
+		});
+
+		const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8" });
+		const objUrl = URL.createObjectURL(blob);
+		window.open(objUrl, "_self");
+	};
+
 	return (
 		<div className={"font-body grid grid-cols-[1fr_900px_1fr] py-24"}>
 			<div />
 			<div>
 				<h1 className={"font-title text-4xl"}>Cities in California</h1>
-				<h5 onClick={downloadAsCsv}>Download as CSV</h5>
+				<a onClick={downloadAsCsv} href={"#"}>
+					Download as CSV
+				</a>
 				<div className={"py-8"}>
 					<h4 className={"text-xl font-medium"}>Here's a dad joke (:</h4>
 					{cities?.map((city, index) => (
