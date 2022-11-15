@@ -6,17 +6,13 @@ import { getCountyDetailed, getCountyProfile } from "./api/census";
 import { getCountyBusinesses, getCountyNames } from "./api/local";
 
 function CurrencyHandler(data: string | number) {
-	return (
-		<p>
-			{data === "-666666666"
-				? ""
-				: new Intl.NumberFormat("en-US", {
-						style: "currency",
-						currency: "USD",
-						maximumFractionDigits: 0,
-				  }).format(Number(data))}
-		</p>
-	);
+	return data === "-666666666"
+		? ""
+		: new Intl.NumberFormat("en-US", {
+				style: "currency",
+				currency: "USD",
+				maximumFractionDigits: 0,
+		  }).format(Number(data));
 }
 
 function NumberHandler(data: string) {
@@ -30,70 +26,46 @@ const Grid = (props: any) => (
 	/>
 );
 
-function County({
-	countyProfile,
-	countyDetailed,
-	countyNames,
-	countyBusinesses,
+function City({
+	city,
 	index,
+	businessesPerCounty,
 }: {
-	countyProfile: CountyProfileType;
-	countyDetailed: CountyDetailedType;
-	countyNames: any;
-	countyBusinesses: any;
+	city: CityColumnsType;
 	index: number;
+	businessesPerCounty: Record<string, any>;
 }) {
 	if (index === 0)
 		return (
 			<Grid>
-				{Object.values(cityColumns).map((x) => (
+				{Object.values(city).map((x) => (
 					<p key={x}>{x}</p>
 				))}
 			</Grid>
 		);
 
-	const county = { ...cityColumns };
-	county.cityName = countyProfile[0].replace(" CDP", "").replace(" city", "");
-	county.countyName = countyNames[county.cityName][5];
-	county.medianIncome = countyProfile[1];
-	county.totalPopulation = countyProfile[2];
-	county.pctNewHouses = countyProfile[3];
-	county.pctMovedIn2019 = countyProfile[4];
-	county.medianGrossRent = countyDetailed[1];
-	county.medianHouseValue = countyDetailed[2];
-	county.houseAskPrice =
-		countyDetailed[3] !== "0" && countyDetailed[4]
-			? Number(NumberHandler(countyDetailed[4])) / Number(NumberHandler(countyDetailed[3]))
-			: 0;
-	county.medianPopulationAge = countyDetailed[5];
-
-	const mapCountyNameBusiness = countyBusinesses[county.countyName];
-	const newBusinesses2019 = mapCountyNameBusiness && mapCountyNameBusiness[17];
-
 	return (
-		<Grid key={county.cityName}>
-			<p>{county.cityName}</p>
-			<p>{countyNames[county.cityName][5]}</p>
-			<p>{Number(county.totalPopulation).toLocaleString("en-US")}</p>
-			<p>{NumberHandler(county.medianPopulationAge)}</p>
-			{CurrencyHandler(county.medianIncome)}
-			{CurrencyHandler(county.medianHouseValue)}
-			{CurrencyHandler(county.houseAskPrice)}
-			{CurrencyHandler(county.medianGrossRent)}
-			<p>{NumberHandler(county.pctNewHouses)}</p>
-			<p>{NumberHandler(county.pctMovedIn2019)}</p>
-			<p>{county.countyName && Number(newBusinesses2019).toLocaleString("en-US")}</p>
+		<Grid key={city.cityName}>
+			{R.values(city).map((val, index, array) => {
+				if (index === array.length - 1)
+					return (
+						<p key={`${city.cityName}${index}`}>
+							{city.countyName &&
+								Number(businessesPerCounty[city.countyName]).toLocaleString("en-US", {
+									maximumFractionDigits: 2,
+								})}
+						</p>
+					);
+
+				return <p key={`${city.cityName}${index}`}>{val}</p>;
+			})}
 		</Grid>
 	);
 }
 
 function App() {
-	const [countyProfiles, setCountyProfiles] = useState<CountyProfileType[]>();
-	const [countyDetailed, setCountyDetailed] = useState<CountyDetailedType[]>();
-	const [countyNames, setCountyNames] = useState<any>({});
-	const [countyBusinesses, setCountyBusinesses] = useState<any>({});
 	const [businessesPerCounty, setBusinessesPerCounty] = useState<any>({});
-	const [cities, setCities] = useState<Record<string, CityColumnsType>>({});
+	const [cities, setCities] = useState<CityColumnsType[]>([]);
 
 	useEffect(() => {
 		Promise.all([
@@ -101,30 +73,55 @@ function App() {
 			getCountyDetailed(),
 			getCountyNames(),
 			getCountyBusinesses(),
-		]).then((data) => {
-			setCountyProfiles(data[0]);
-			setCountyDetailed(data[1]);
-			setCountyNames(R.indexBy((x: any) => x[0], data[2]));
-			setCountyBusinesses(R.indexBy((x: any) => x[0], data[3]));
+		]).then((data: [CountyProfileType[], CountyDetailedType[], any[], any[]]) => {
+			const countyProfiles = data[0];
+			const countyDetails = data[1];
+			const countyNames = R.indexBy((x: any) => x[0], data[2]);
+			const countyBusinesses = R.indexBy((x: any) => x[0], data[3]);
+
+			const cities = [cityColumns];
+			const businessesPerCounty: Record<string, any> = {};
+
+			countyProfiles.map((countyProfile, index) => {
+				if (index === 0) return;
+
+				const city = { ...cityColumns };
+				const countyDetailed = countyDetails[index];
+				city.cityName = countyProfile[0].replace(" CDP", "").replace(" city", "");
+				city.countyName = countyNames[city.cityName][5];
+				city.medianIncome = CurrencyHandler(countyProfile[1]);
+				city.totalPopulation = NumberHandler(countyProfile[2]);
+				city.pctNewHouses = NumberHandler(countyProfile[3]);
+				city.pctMovedIn2019 = NumberHandler(countyProfile[4]);
+				city.medianGrossRent = CurrencyHandler(countyDetailed[1]);
+				city.medianHouseValue = CurrencyHandler(countyDetailed[2]);
+				city.houseAskPrice =
+					countyDetailed[3] !== "0" && countyDetailed[4]
+						? CurrencyHandler(
+								Number(NumberHandler(countyDetailed[4])) / Number(NumberHandler(countyDetailed[3])),
+						  )
+						: 0;
+				city.medianPopulationAge = NumberHandler(countyDetailed[5]);
+
+				if (city.countyName) {
+					businessesPerCounty[city.countyName] =
+						(Number(businessesPerCounty[city.countyName]) || 0) + Number(city.totalPopulation);
+				}
+				cities.push(city);
+			});
+
+			// calculate new businesses for each county
+			// applications ➗totalCountyPopulation * 100
+			R.forEachObjIndexed((value, key, obj) => {
+				const numberOfBusinesses = countyBusinesses[key];
+				businessesPerCounty[key] =
+					numberOfBusinesses && Number((numberOfBusinesses[17] / Number(value)) * 100);
+			}, businessesPerCounty);
+
+			setCities(cities);
+			setBusinessesPerCounty(businessesPerCounty);
 		});
 	}, []);
-
-	useEffect(() => {
-		if (R.isEmpty(countyNames) || R.isEmpty(countyBusinesses)) return;
-		const businessesPerCounty = {};
-		R.forEachObjIndexed((value, key, obj) => {
-			// countyNames[key][5];
-			// businessesPerCounty[key]
-		}, countyNames);
-		// setBusinessesPerCounty();
-	}, [countyNames, countyBusinesses]);
-
-	if (R.isEmpty(countyNames) || R.isEmpty(countyBusinesses)) {
-		return <p>Loading...</p>;
-	}
-
-	console.log(countyNames);
-	console.log(countyBusinesses);
 
 	return (
 		<div className={"font-body grid grid-cols-[1fr_900px_1fr] py-24"}>
@@ -133,17 +130,9 @@ function App() {
 				<h1 className={"font-title text-4xl"}>Cities in California</h1>
 				<div className={"py-8"}>
 					<h4 className={"text-xl font-medium"}>Here's a dad joke (:</h4>
-					{countyDetailed &&
-						countyProfiles?.map((countyProfile, index) => (
-							<County
-								countyProfile={countyProfile}
-								countyDetailed={countyDetailed[index]}
-								countyNames={countyNames}
-								countyBusinesses={countyBusinesses}
-								index={index}
-								key={countyProfile[0]}
-							/>
-						))}
+					{cities?.map((city, index) => (
+						<City city={city} index={index} key={index} businessesPerCounty={businessesPerCounty} />
+					))}
 				</div>
 			</div>
 			<div />

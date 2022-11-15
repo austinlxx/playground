@@ -1,15 +1,15 @@
 export type CityColumnsType = {
 	cityName: string;
 	countyName: string;
-	medianIncome: string;
-	totalPopulation: string;
-	pctNewHouses: string;
-	pctMovedIn2019: string;
-	medianGrossRent: string;
-	medianHouseValue: string;
+	medianIncome: string | number;
+	totalPopulation: string | number;
+	pctNewHouses: string | number;
+	pctMovedIn2019: string | number;
+	medianGrossRent: string | number;
+	medianHouseValue: string | number;
 	houseAskPrice: string | number;
-	medianPopulationAge: string;
-	newBusinesses: string | object;
+	medianPopulationAge: string | number;
+	newBusinessesIn2019: string;
 };
 
 export const cityColumns: CityColumnsType = {
@@ -23,5 +23,5 @@ export const cityColumns: CityColumnsType = {
 	medianGrossRent: "Median gross rent",
 	pctNewHouses: "% new houses",
 	pctMovedIn2019: "% moved in 2019",
-	newBusinesses: "New businesses",
+	newBusinessesIn2019: "New businesses",
 };
