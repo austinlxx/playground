@@ -46,7 +46,6 @@ function City({ city, index }: { city: CityColumnsType; index: number }) {
 }
 
 function App() {
-	const [businessesPerCounty, setBusinessesPerCounty] = useState<any>({});
 	const [cities, setCities] = useState<CityColumnsType[]>([]);
 
 	useEffect(() => {
@@ -114,7 +113,6 @@ function App() {
 			});
 
 			setCities(cities);
-			setBusinessesPerCounty(businessesPerCounty);
 		});
 	}, []);
 
