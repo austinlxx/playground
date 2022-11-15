@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { CountyDetailedType, CountyProfileType } from "@/types/api";
-import { cityColumns } from "./county";
+import { cityColumns, CityColumnsType } from "./county";
 import * as R from "ramda";
-import Parse from "papaparse";
+import { getCountyDetailed, getCountyProfile } from "./api/census";
+import { getCountyBusinesses, getCountyNames } from "./api/local";
 
 function CurrencyHandler(data: string | number) {
 	return (
@@ -92,47 +93,20 @@ function App() {
 	const [countyNames, setCountyNames] = useState<any>({});
 	const [countyBusinesses, setCountyBusinesses] = useState<any>({});
 	const [businessesPerCounty, setBusinessesPerCounty] = useState<any>({});
+	const [cities, setCities] = useState<Record<string, CityColumnsType>>({});
 
 	useEffect(() => {
-		fetch(
-			"https://api.census.gov/data/2020/acs/acs5/profile?get=NAME,DP03_0086E,DP05_0001E,DP04_0017PE,DP04_0051PE&for=place:*&in=state:06&key=0fda0a84653df2cc0b65e7df1ebdb852b543c6ca",
-			{
-				method: "get",
-				headers: { Accept: "application/json" },
-			},
-		)
-			.then((res) => res.json())
-			.then((data: CountyProfileType[]) => setCountyProfiles(data));
-
-		fetch(
-			"https://api.census.gov/data/2020/acs/acs5?get=NAME,B25031_001E,B25077_001E,B25085_001E,B25086_001E,B05004_001E&for=place:*&in=state:06&key=0fda0a84653df2cc0b65e7df1ebdb852b543c6ca",
-			{
-				method: "get",
-				headers: { Accept: "application/json" },
-			},
-		)
-			.then((res) => res.json())
-			.then((data: CountyDetailedType[]) => setCountyDetailed(data));
-
-		fetch("/county-names.csv", {
-			method: "get",
-			headers: { Accept: "application/csv" },
-		})
-			.then((res) => res.text())
-			.then((csv) => {
-				const { data } = Parse.parse(csv);
-				setCountyNames(R.indexBy((x: any) => x[0], data));
-			});
-
-		fetch("/county-businesses.csv", {
-			method: "get",
-			headers: { Accept: "application/csv" },
-		})
-			.then((res) => res.text())
-			.then((csv) => {
-				const { data } = Parse.parse(csv);
-				setCountyBusinesses(R.indexBy((x: any) => x[0], data));
-			});
+		Promise.all([
+			getCountyProfile(),
+			getCountyDetailed(),
+			getCountyNames(),
+			getCountyBusinesses(),
+		]).then((data) => {
+			setCountyProfiles(data[0]);
+			setCountyDetailed(data[1]);
+			setCountyNames(R.indexBy((x: any) => x[0], data[2]));
+			setCountyBusinesses(R.indexBy((x: any) => x[0], data[3]));
+		});
 	}, []);
 
 	useEffect(() => {

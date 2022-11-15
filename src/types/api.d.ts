@@ -1,5 +1,5 @@
 export type CountyProfileType = [
-	countyName: string,
+	cityName: string,
 	medianIncome: string,
 	totalPopulation: string,
 	PctNewHouses: string,
@@ -7,7 +7,7 @@ export type CountyProfileType = [
 ];
 
 export type CountyDetailedType = [
-	countyName: string,
+	cityName: string,
 	medianGrossRent: string,
 	medianHouseValue: string,
 	totalHouseAskPrice: string,
