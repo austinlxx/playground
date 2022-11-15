@@ -21,7 +21,7 @@ function NumberHandler(data: string) {
 
 const Grid = (props: any) => (
 	<div
-		className={`grid grid-cols-[340px_200px_100px_100px_100px_100px_100px_100px_100px_100px_100px]`}
+		className={`grid grid-cols-[340px_200px_180px_180px_180px_180px_180px_180px_180px_180px_180px]`}
 		{...props}
 	/>
 );
@@ -135,15 +135,14 @@ function App() {
 	};
 
 	return (
-		<div className={"font-body grid grid-cols-[1fr_900px_1fr] py-24"}>
+		<div className={"font-body grid grid-cols-[1fr_auto_1fr] py-24"}>
 			<div />
-			<div>
+			<div className={"px-24"}>
 				<h1 className={"font-title text-4xl"}>Cities in California</h1>
 				<a onClick={downloadAsCsv} href={"#"}>
 					Download as CSV
 				</a>
 				<div className={"py-8"}>
-					<h4 className={"text-xl font-medium"}>Here's a dad joke (:</h4>
 					{cities?.map((city, index) => (
 						<City city={city} index={index} key={index} />
 					))}
