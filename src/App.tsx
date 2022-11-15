@@ -26,15 +26,7 @@ const Grid = (props: any) => (
 	/>
 );
 
-function City({
-	city,
-	index,
-	businessesPerCounty,
-}: {
-	city: CityColumnsType;
-	index: number;
-	businessesPerCounty: Record<string, any>;
-}) {
+function City({ city, index }: { city: CityColumnsType; index: number }) {
 	if (index === 0)
 		return (
 			<Grid>
@@ -46,19 +38,9 @@ function City({
 
 	return (
 		<Grid key={city.cityName}>
-			{R.values(city).map((val, index, array) => {
-				if (index === array.length - 1)
-					return (
-						<p key={`${city.cityName}${index}`}>
-							{city.countyName &&
-								Number(businessesPerCounty[city.countyName]).toLocaleString("en-US", {
-									maximumFractionDigits: 2,
-								})}
-						</p>
-					);
-
-				return <p key={`${city.cityName}${index}`}>{val}</p>;
-			})}
+			{R.values(city).map((val, index, array) => (
+				<p key={`${city.cityName}${index}`}>{val}</p>
+			))}
 		</Grid>
 	);
 }
@@ -66,6 +48,17 @@ function City({
 function App() {
 	const [businessesPerCounty, setBusinessesPerCounty] = useState<any>({});
 	const [cities, setCities] = useState<CityColumnsType[]>([]);
+
+	const downloadAsCsv = () => {
+		const commaDelimited: any[] = [];
+
+		cities.map((city, index, array) => {
+			if (index === 0) return commaDelimited.push(Object.values(cityColumns));
+			commaDelimited.push(Object.values(city));
+		});
+
+		console.log(commaDelimited);
+	};
 
 	useEffect(() => {
 		Promise.all([
@@ -79,7 +72,7 @@ function App() {
 			const countyNames = R.indexBy((x: any) => x[0], data[2]);
 			const countyBusinesses = R.indexBy((x: any) => x[0], data[3]);
 
-			const cities = [cityColumns];
+			let cities = [cityColumns];
 			const businessesPerCounty: Record<string, any> = {};
 
 			countyProfiles.map((countyProfile, index) => {
@@ -118,6 +111,19 @@ function App() {
 					numberOfBusinesses && Number((numberOfBusinesses[17] / Number(value)) * 100);
 			}, businessesPerCounty);
 
+			// adjust newBusinessesIn2019 column
+			cities = cities.map((city, index) => {
+				if (index === 0) return city;
+
+				return R.assocPath(
+					["newBusinessesIn2019"],
+					businessesPerCounty[city.countyName]?.toLocaleString("en-US", {
+						maximumFractionDigits: 2,
+					}) || 0,
+					city,
+				);
+			});
+
 			setCities(cities);
 			setBusinessesPerCounty(businessesPerCounty);
 		});
@@ -128,10 +134,11 @@ function App() {
 			<div />
 			<div>
 				<h1 className={"font-title text-4xl"}>Cities in California</h1>
+				<h5 onClick={downloadAsCsv}>Download as CSV</h5>
 				<div className={"py-8"}>
 					<h4 className={"text-xl font-medium"}>Here's a dad joke (:</h4>
 					{cities?.map((city, index) => (
-						<City city={city} index={index} key={index} businessesPerCounty={businessesPerCounty} />
+						<City city={city} index={index} key={index} />
 					))}
 				</div>
 			</div>
