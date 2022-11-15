@@ -122,7 +122,9 @@ function App() {
 
 		cities.map((city, index) => {
 			if (index === 0) return arr.push(Object.values(cityColumns));
-			arr.push(Object.values(city).map((val) => `"${val}"`));
+			arr.push(
+				Object.values(city).map((val) => `"${val}"`.replaceAll("$", "").replaceAll(",", "")),
+			);
 		});
 
 		arr.map((row) => {
