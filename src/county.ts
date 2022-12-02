@@ -1,4 +1,5 @@
 export type CityColumnsType = {
+	[key: string]: any;
 	cityName: string;
 	countyName: string;
 	medianIncome: string | number;

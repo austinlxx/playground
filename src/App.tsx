@@ -47,75 +47,82 @@ function City({ city, index }: { city: CityColumnsType; index: number }) {
 	);
 }
 
-const TestSlider = ({ steps }: { steps: number[] }) => {
+const SLIDER_BUCKET_SPLIT_SIZE = 24;
+
+const TestSlider = ({ bucket }: { bucket: BucketType }) => {
 	const [sliderValue, setSliderValue] = useState([0]);
-	const stepsTotal = useMemo(
-		() => steps.reduce((previousValue, currentValue) => previousValue + currentValue, 0),
+	const bucketTotals = Object.values(bucket.totals);
+	const numOfItems = useMemo(
+		() =>
+			bucketTotals.reduce(
+				(previousValue, currentValue, currentIndex, array) => previousValue + currentValue,
+				0,
+			),
 		[],
 	);
+	const bucketMaxValue = bucket.high;
 
 	return (
 		<>
 			<div className="h-16 grid grid-flow-col items-end">
-				{steps.map((x, index) => (
-					<SliderStep
-						steps={steps}
-						stepsTotal={stepsTotal}
+				{bucketTotals.map((x, index) => (
+					<SliderBucket
+						bucketTotals={bucketTotals}
+						bucketMaxValue={bucketMaxValue}
 						index={index}
 						sliderValue={sliderValue}
-						x={x}
 						key={index}
+						numOfItems={numOfItems}
 					/>
 				))}
 			</div>
-			<Slider value={sliderValue} onValueChange={(x) => setSliderValue(x)} />
+			<Slider value={sliderValue} onValueChange={(x) => setSliderValue(x)} max={bucketMaxValue} />
 		</>
 	);
 };
 
-const SliderStep = ({
-	steps,
-	x,
-	stepsTotal,
+const SliderBucket = ({
+	bucketTotals,
 	sliderValue,
 	index,
+	bucketMaxValue,
+	numOfItems,
 }: {
-	steps: number[];
-	x: number;
-	stepsTotal: number;
+	bucketTotals: number[];
 	sliderValue: number[];
 	index: number;
+	bucketMaxValue: number;
+	numOfItems: number;
 }) => {
-	const sliderBarDivided = useMemo(() => 100 / steps.length, []);
-	const stepWidth = useMemo(() => sliderBarDivided * index, []);
+	const sliderBarDivided = useMemo(() => bucketMaxValue / bucketTotals.length, []);
+	const bucketWidth = useMemo(() => sliderBarDivided * index, []);
 	const isActive = useMemo(
 		() =>
-			(index === steps.length - 1 && sliderValue[0] === 100) ||
+			(index === bucketTotals.length - 1 && sliderValue[0] === bucketMaxValue) ||
 			(index === 0 && sliderValue[0] === 0) ||
-			(sliderValue[0] >= stepWidth && sliderValue[0] < stepWidth + sliderBarDivided),
+			(sliderValue[0] >= bucketWidth && sliderValue[0] < bucketWidth + sliderBarDivided),
 		[sliderValue[0]],
 	);
 
 	return (
 		<div
 			className={isActive ? "bg-amber-500" : "bg-gray-300"}
-			style={{ height: `${(x / stepsTotal) * 100}%` }}
+			style={{ height: `${(bucketTotals[index] / numOfItems) * 100}%` }}
 		/>
 	);
 };
 
+type BucketType = {
+	high: number;
+	column: string;
+	splits: Record<number, number>;
+	totals: Record<number, number>;
+	key: string;
+};
+
 function App() {
 	const [cities, setCities] = useState<CityColumnsType[]>([]);
-	const [buckets, setBuckets] = useState<
-		{
-			high: number;
-			column: string;
-			splits: Record<number, number>;
-			totals: Record<number, number>;
-		}[]
-	>([]);
-
-	const SLIDER_BUCKET_SPLIT_SIZE = 24;
+	const [buckets, setBuckets] = useState<BucketType[]>([]);
 
 	useEffect(() => {
 		Promise.all([
@@ -192,9 +199,9 @@ function App() {
 			return Object.values(city).map((val) => `${val}`.replaceAll("$", "").replaceAll(",", ""));
 		});
 
-		const columnArrMeta: { high: number; column: string }[] = [];
+		const columnArrMeta: { high: number; column: string; key: string }[] = [];
 		const columnArrData = Object.keys(cityColumns).map((column, index) => {
-			columnArrMeta.push({ high: 0, column });
+			columnArrMeta.push({ high: 0, column: cityColumns[column], key: column });
 			return R.map((row) => {
 				const value = row[index];
 				const toNumber = +value;
@@ -226,7 +233,6 @@ function App() {
 
 		console.log(buckets);
 
-		// columnArrData.map(() => {});
 		setBuckets(buckets);
 	}, [cities]);
 
@@ -269,7 +275,7 @@ function App() {
 					Download as CSV
 				</a>
 				<div className="py-8 w-fit">
-					<TestSlider steps={steps} />
+					{!R.isEmpty(buckets) && <TestSlider bucket={buckets[3]} />}
 				</div>
 				<div className="py-8">
 					{cities?.map((city, index) => (

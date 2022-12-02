@@ -4,15 +4,17 @@ import "./styles.css";
 const Slider = ({
 	value,
 	onValueChange,
+	max,
 }: {
 	value: number[];
 	onValueChange: (value: number[]) => void;
+	max: number;
 }) => (
 	<form>
 		<SliderRadix.Root
 			className="SliderRoot"
-			defaultValue={[50]}
-			max={100}
+			defaultValue={value}
+			max={max}
 			step={1}
 			aria-label="Volume"
 			onValueChange={onValueChange}
