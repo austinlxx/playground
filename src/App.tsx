@@ -47,9 +47,11 @@ function City({ city, index }: { city: CityColumnsType; index: number }) {
 	);
 }
 
-const SLIDER_BUCKET_SPLIT_SIZE = 24;
+const SLIDER_BUCKET_SPLIT_SIZE = 12;
 
 const TestSlider = ({ bucket }: { bucket: BucketType }) => {
+	if (bucket.high === 0) return null;
+
 	const [sliderValue, setSliderValue] = useState([0]);
 	const bucketTotals = Object.values(bucket.totals);
 	const numOfItems = useMemo(
@@ -64,19 +66,29 @@ const TestSlider = ({ bucket }: { bucket: BucketType }) => {
 
 	return (
 		<>
-			<div className="h-16 grid grid-flow-col items-end">
-				{bucketTotals.map((x, index) => (
-					<SliderBucket
-						bucketTotals={bucketTotals}
-						bucketMaxValue={bucketMaxValue}
-						index={index}
-						sliderValue={sliderValue}
-						key={index}
-						numOfItems={numOfItems}
+			<h4 className="font-semibold text-sm">{bucket.column}</h4>
+			<div className="grid">
+				<div>
+					<div className="h-16 grid grid-flow-col items-end">
+						{bucketTotals.map((x, index) => (
+							<SliderBucket
+								bucketTotals={bucketTotals}
+								bucketMaxValue={bucketMaxValue}
+								index={index}
+								sliderValue={sliderValue}
+								key={index}
+								numOfItems={numOfItems}
+							/>
+						))}
+					</div>
+					<Slider
+						value={sliderValue}
+						onValueChange={(x) => setSliderValue(x)}
+						max={bucketMaxValue}
 					/>
-				))}
+				</div>
+				<span className="justify-self-center">{sliderValue}</span>
 			</div>
-			<Slider value={sliderValue} onValueChange={(x) => setSliderValue(x)} max={bucketMaxValue} />
 		</>
 	);
 };
@@ -274,8 +286,8 @@ function App() {
 				<a onClick={downloadAsCsv} href="#">
 					Download as CSV
 				</a>
-				<div className="py-8 w-fit">
-					{!R.isEmpty(buckets) && <TestSlider bucket={buckets[3]} />}
+				<div className="py-8 w-80">
+					{!R.isEmpty(buckets) && buckets.map((bucket) => <TestSlider bucket={bucket} />)}
 				</div>
 				<div className="py-8">
 					{cities?.map((city, index) => (

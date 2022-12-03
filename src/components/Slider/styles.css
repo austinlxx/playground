@@ -4,7 +4,6 @@
     align-items: center;
     user-select: none;
     touch-action: none;
-    width: 200px;
 }
 .SliderRoot[data-orientation='horizontal'] {
     height: 20px;
