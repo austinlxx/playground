@@ -5,7 +5,6 @@ import * as R from "ramda";
 import { getCountyDetailed, getCountyProfile } from "./api/census";
 import { getCountyBusinesses, getCountyNames } from "./api/local";
 import Slider from "./components/Slider/Slider";
-import slider from "./components/Slider/Slider";
 
 function CurrencyHandler(data: string | number) {
 	return data === "-666666666"
@@ -87,7 +86,10 @@ const TestSlider = ({ bucket }: { bucket: BucketType }) => {
 						max={bucketMaxValue}
 					/>
 				</div>
-				<span className="justify-self-center">{sliderValue}</span>
+				<span className="justify-self-center">
+					{sliderValue[0].toLocaleString()}
+					{sliderValue[0] === bucket.high ? "+" : ""}
+				</span>
 			</div>
 		</>
 	);
@@ -240,11 +242,68 @@ function App() {
 				}
 			}, col);
 
-			return { splits: bucketSplits, totals: bucketCounter, ...columnArrMeta[index] };
+			const balanceSplits: (
+				col: any[],
+				bucketCounter: Record<number, any>,
+				bucketSplits: Record<number, any>,
+				bucketHigh: number,
+			) => {
+				high: any;
+				splits: Record<number, any>;
+				column: string;
+				totals: Record<number, any>;
+				key: string;
+			} = (col, bucketCounter, bucketSplits, bucketHigh) => {
+				const arr = R.values(bucketCounter);
+				let highestTotalIndex = 0;
+				const highestTotal = arr.reduce((previousValue, currentValue, currentIndex, array) => {
+					if (currentValue > previousValue) {
+						highestTotalIndex = currentIndex;
+						return currentValue;
+					}
+					return previousValue;
+				}, 0);
+				if (highestTotal < 800) {
+					return {
+						splits: bucketSplits,
+						totals: bucketCounter,
+						...columnArrMeta[index],
+						high: bucketSplits[SLIDER_BUCKET_SPLIT_SIZE],
+					};
+				}
+
+				const newBucketCounter = { ...bucketCounter };
+				const newBucketSplits = { ...bucketSplits };
+				const newBucketHigh = bucketHigh * 0.8;
+				const bucketSplitBy = newBucketHigh / SLIDER_BUCKET_SPLIT_SIZE;
+				for (let i = 0; i <= SLIDER_BUCKET_SPLIT_SIZE; i++) {
+					newBucketSplits[i] = i * bucketSplitBy;
+					newBucketCounter[i] = 0;
+				}
+
+				R.map((x: string | number) => {
+					if (typeof x === "number") {
+						// shrink max value
+						const bucketPosition = Math.floor(x / bucketSplitBy);
+						if (bucketPosition > SLIDER_BUCKET_SPLIT_SIZE)
+							newBucketCounter[SLIDER_BUCKET_SPLIT_SIZE - 1] =
+								newBucketCounter[SLIDER_BUCKET_SPLIT_SIZE - 1] + 1;
+						else newBucketCounter[bucketPosition] = newBucketCounter[bucketPosition] + 1;
+					}
+				}, col);
+
+				return balanceSplits(col, newBucketCounter, newBucketSplits, newBucketHigh);
+			};
+
+			// return {
+			// 	splits: bucketSplits,
+			// 	totals: bucketCounter,
+			// 	...columnArrMeta[index],
+			// };
+			return balanceSplits(col, bucketCounter, bucketSplits, columnArrMeta[index].high);
 		});
 
 		console.log(buckets);
-
 		setBuckets(buckets);
 	}, [cities]);
 
@@ -272,12 +331,6 @@ function App() {
 			);
 		});
 
-	const steps = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-
-	// useEffect(() => {
-	// 	console.log(sliderValue);
-	// }, [sliderValue]);
-
 	return (
 		<div className="font-body grid grid-cols-[1fr_auto_1fr] py-24">
 			<div />
@@ -286,8 +339,9 @@ function App() {
 				<a onClick={downloadAsCsv} href="#">
 					Download as CSV
 				</a>
-				<div className="py-8 w-80">
-					{!R.isEmpty(buckets) && buckets.map((bucket) => <TestSlider bucket={bucket} />)}
+				<div className="py-8 w-128">
+					{!R.isEmpty(buckets) &&
+						buckets.map((bucket) => <TestSlider bucket={bucket} key={bucket.key} />)}
 				</div>
 				<div className="py-8">
 					{cities?.map((city, index) => (
