@@ -7,10 +7,19 @@ module.exports = {
         guide: "repeat(auto-fit, minmax(400px, 400px))",
         guideMobile: "repeat(auto-fit, minmax(1fr, 400px))",
       },
+      zIndex: {
+        "negative": -1,
+      },
+      height: {
+        120: "30rem",
+        128: "32rem",
+      },
       maxHeight: {
+        120: "30rem",
         128: "32rem",
       },
       maxWidth: {
+        200: "32rem",
         300: "75rem",
         400: "87rem",
       },
@@ -23,10 +32,10 @@ module.exports = {
           "Arthemys Display, Helvetica Neue, Helvetica, Segoe UI, Arial, sans-serif",
         ],
         title: [
-          "Gustavo, Helvetica Neue, Helvetica, Segoe UI, Arial, sans-serif",
+          "Neue Haas Grotesk Display Pro, Helvetica Neue, Helvetica, Segoe UI, Arial, sans-serif",
         ],
         body: [
-          "FK Grotesk, Helvetica Neue, Helvetica, Segoe UI, Arial, sans-serif",
+          "TT Interfaces, Helvetica Neue, Helvetica, Segoe UI, Arial, sans-serif",
         ],
       },
       fontSize: {
@@ -37,6 +46,9 @@ module.exports = {
       },
       borderRadius: {
         "4xl": "80px"
+      },
+      lineHeight: {
+        "title": "50px"
       },
       colors: {
         gray: {
