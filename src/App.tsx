@@ -46,7 +46,7 @@ function City({ city, index }: { city: CityColumnsType; index: number }) {
 	);
 }
 
-const SLIDER_BUCKET_SPLIT_SIZE = 12;
+const SLIDER_BUCKET_SPLIT_SIZE = 24;
 
 const TestSlider = ({ bucket }: { bucket: BucketType }) => {
 	if (bucket.high === 0) return null;
@@ -189,18 +189,31 @@ function App() {
 					numberOfBusinesses && Number((numberOfBusinesses[17] / Number(value)) * 100);
 			}, businessesPerCounty);
 
-			// adjust newBusinessesIn2019 column
-			cities = cities.map((city, index) => {
-				if (index === 0) return city;
+			const allowedCities = [
+				"Anaheim, California",
+				"Moreno Valley, California",
+				"Ontario, California",
+				"Oxnard, California",
+				"Chula Vista, California",
+				"Santa Ana, California",
+				"Stockton, California",
+			];
 
-				return R.assocPath(
-					["newBusinessesIn2019"],
-					businessesPerCounty[city.countyName]?.toLocaleString("en-US", {
-						maximumFractionDigits: 2,
-					}) || 0,
-					city,
-				);
-			});
+			// adjust newBusinessesIn2019 column
+			cities = cities
+				.map((city, index) => {
+					if (index === 0) return city;
+
+					return R.assocPath(
+						["newBusinessesIn2019"],
+						businessesPerCounty[city.countyName]?.toLocaleString("en-US", {
+							maximumFractionDigits: 2,
+						}) || 0,
+						city,
+					);
+				})
+				.filter((city) => city.totalPopulation > 1200)
+				.filter((city) => allowedCities.includes(city.cityName));
 
 			setCities(cities);
 		});
